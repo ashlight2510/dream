@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>꿈일기</title>
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --card: #121926;
+        --muted: #8aa0b8;
+        --text: #eaf2ff;
+        --accent: #6aa9ff;
+        --danger: #ff6a6a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR",
+          sans-serif;
+        background: radial-gradient(
+          1000px 600px at 20% 0%,
+          #142038 0%,
+          var(--bg) 60%
+        );
+        color: var(--text);
+      }
+      header {
+        padding: 24px 16px 8px;
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 24px;
+        letter-spacing: -0.2px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 16px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1.2fr 1fr;
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: color-mix(in srgb, var(--card) 92%, #000 8%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+      .row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+      @media (max-width: 520px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 10px 12px;
+        outline: none;
+      }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: color-mix(in srgb, var(--accent) 70%, #fff 30%);
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 12px;
+        cursor: pointer;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      button.primary {
+        background: color-mix(in srgb, var(--accent) 70%, #000 30%);
+      }
+      button.danger {
+        background: color-mix(in srgb, var(--danger) 65%, #000 35%);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .toolbar > * {
+        flex: 1;
+        min-width: 160px;
+      }
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .item {
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .title {
+        font-weight: 700;
+        margin: 8px 0 6px;
+      }
+      .content {
+        color: rgba(234, 242, 255, 0.9);
+        white-space: pre-wrap;
+        line-height: 1.6;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .split {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .split button {
+        flex: 1;
+      }
+      .empty {
+        color: var(--muted);
+        text-align: center;
+        padding: 24px 8px;
+      }
+      .footer {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 16px 24px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>꿈일기</h1>
+      <div class="sub">
+        브라우저에 저장되는 개인 꿈 기록장 (localStorage 사용).<br />
+        내보내기(JSON)로 백업하거나 가져오기(JSON)로 복원할 수 있어요.
+      </div>
+    </header>
+
+    <main>
+      <!-- 입력 -->
+      <section class="card" aria-label="꿈일기 작성">
+        <h2 style="margin: 0 0 12px; font-size: 16px">기록하기</h2>
+
+        <div class="row">
+          <div>
+            <label for="date">날짜</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label for="lucid">자각몽</label>
+            <select id="lucid">
+              <option value="no">아니오</option>
+              <option value="yes">예</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px">
+          <div>
+            <label for="mood">기분</label>
+            <select id="mood">
+              <option value="🙂 좋음">🙂 좋음</option>
+              <option value="😐 보통">😐 보통</option>
+              <option value="😟 불안">😟 불안</option>
+              <option value="😱 악몽">😱 악몽</option>
+              <option value="🤯 혼란">🤯 혼란</option>
+            </select>
+          </div>
+          <div>
+            <label for="tags">태그 (쉼표로 구분)</label>
+            <input id="tags" placeholder="예: 학교, 바다, 추격전" />
+          </div>
+        </div>
+
+        <div style="margin-top: 10px">
+          <label for="title">제목</label>
+          <input
+            id="title"
+            placeholder="예: 바다 위를 걷는 꿈"
+            maxlength="80"
+          />
+        </div>
+
+        <div style="margin-top: 10px">
+          <label for="content">내용</label>
+          <textarea
+            id="content"
+            placeholder="꿈 내용을 자유롭게 적어주세요."
+          ></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="saveBtn">저장</button>
+          <button id="resetBtn" type="button">입력 초기화</button>
+          <button class="danger" id="deleteSelectedBtn" type="button" disabled>
+            선택 삭제
+          </button>
+        </div>
+
+        <hr
+          style="
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 16px 0;
+          "
+        />
+
+        <h3 style="margin: 0 0 10px; font-size: 14px">백업/복원</h3>
+        <div class="split">
+          <button id="exportBtn" type="button">내보내기 (JSON)</button>
+          <button id="importBtn" type="button">가져오기 (JSON)</button>
+        </div>
+        <input id="importFile" type="file" accept="application/json" hidden />
+        <p class="muted" style="margin: 10px 0 0">
+          저장 위치: <span class="mono">localStorage</span> (이 브라우저/기기
+          내)
+        </p>
+      </section>
+
+      <!-- 목록 -->
+      <section class="card" aria-label="꿈일기 목록">
+        <div class="toolbar">
+          <div>
+            <label for="search">검색</label>
+            <input id="search" placeholder="제목/내용/태그 검색" />
+          </div>
+          <div>
+            <label for="filterMood">기분 필터</label>
+            <select id="filterMood">
+              <option value="">전체</option>
+              <option value="🙂 좋음">🙂 좋음</option>
+              <option value="😐 보통">😐 보통</option>
+              <option value="😟 불안">😟 불안</option>
+              <option value="😱 악몽">😱 악몽</option>
+              <option value="🤯 혼란">🤯 혼란</option>
+            </select>
+          </div>
+          <div>
+            <label for="sort">정렬</label>
+            <select id="sort">
+              <option value="new">최신순</option>
+              <option value="old">오래된순</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="list" class="list"></div>
+        <div id="empty" class="empty" style="display: none">
+          아직 기록이 없어요. 왼쪽에서 꿈을 저장해 보세요.
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">
+      팁: 크롬/엣지에서 “앱으로 설치”하면 간단한 꿈일기 앱처럼 쓸 수 있어요.
+    </div>
+
+    <script>
+      // ----- Data layer (localStorage) -----
+      const STORAGE_KEY = "dream_journal_v1";
+      /** @typedef {{id:string, date:string, title:string, content:string, mood:string, lucid:boolean, tags:string[], createdAt:number}} Dream */
+
+      function loadDreams() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const arr = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(arr)) return [];
+          return arr;
+        } catch {
+          return [];
+        }
+      }
+
+      function saveDreams(dreams) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dreams));
+      }
+
+      function uid() {
+        return (
+          Math.random().toString(16).slice(2) + "-" + Date.now().toString(16)
+        );
+      }
+
+      // ----- UI refs -----
+      const $ = (id) => document.getElementById(id);
+
+      const dateEl = $("date");
+      const lucidEl = $("lucid");
+      const moodEl = $("mood");
+      const tagsEl = $("tags");
+      const titleEl = $("title");
+      const contentEl = $("content");
+
+      const saveBtn = $("saveBtn");
+      const resetBtn = $("resetBtn");
+      const deleteSelectedBtn = $("deleteSelectedBtn");
+
+      const searchEl = $("search");
+      const filterMoodEl = $("filterMood");
+      const sortEl = $("sort");
+
+      const listEl = $("list");
+      const emptyEl = $("empty");
+
+      const exportBtn = $("exportBtn");
+      const importBtn = $("importBtn");
+      const importFileEl = $("importFile");
+
+      // ----- State -----
+      let dreams = loadDreams();
+      let selectedIds = new Set();
+
+      // default date = today (local)
+      const today = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      dateEl.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(
+        today.getDate()
+      )}`;
+
+      // ----- Helpers -----
+      function parseTags(input) {
+        return input
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .slice(0, 20);
+      }
+
+      function escapeHtml(str) {
+        return str.replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            }[m])
+        );
+      }
+
+      function formatDate(iso) {
+        if (!iso) return "날짜 없음";
+        const [y, m, d] = iso.split("-");
+        return `${y}.${m}.${d}`;
+      }
+
+      function matches(d, q, moodFilter) {
+        const query = q.trim().toLowerCase();
+        const hay = [
+          d.title,
+          d.content,
+          d.tags.join(" "),
+          d.mood,
+          d.lucid ? "자각몽" : "",
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const okQuery = !query || hay.includes(query);
+        const okMood = !moodFilter || d.mood === moodFilter;
+        return okQuery && okMood;
+      }
+
+      function sortDreams(arr, mode) {
+        const copy = [...arr];
+        copy.sort((a, b) =>
+          mode === "old" ? a.createdAt - b.createdAt : b.createdAt - a.createdAt
+        );
+        return copy;
+      }
+
+      function updateDeleteButton() {
+        deleteSelectedBtn.disabled = selectedIds.size === 0;
+        deleteSelectedBtn.textContent = selectedIds.size
+          ? `선택 삭제 (${selectedIds.size})`
+          : "선택 삭제";
+      }
+
+      // ----- Render -----
+      function render() {
+        const q = searchEl.value || "";
+        const moodFilter = filterMoodEl.value || "";
+        const sorted = sortDreams(dreams, sortEl.value);
+
+        const filtered = sorted.filter((d) => matches(d, q, moodFilter));
+
+        listEl.innerHTML = "";
+        if (filtered.length === 0) {
+          emptyEl.style.display = "block";
+          return;
+        }
+        emptyEl.style.display = "none";
+
+        for (const d of filtered) {
+          const isChecked = selectedIds.has(d.id);
+          const tags = d.tags
+            .map((t) => `<span class="badge">#${escapeHtml(t)}</span>`)
+            .join(" ");
+
+          const el = document.createElement("div");
+          el.className = "item";
+          el.innerHTML = `
+          <div class="meta">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" data-id="${d.id}" ${
+            isChecked ? "checked" : ""
+          } />
+              <span class="badge">${escapeHtml(formatDate(d.date))}</span>
+              <span class="badge">${escapeHtml(d.mood)}</span>
+              <span class="badge">${d.lucid ? "자각몽" : "일반"}</span>
+            </label>
+          </div>
+          <div class="title">${escapeHtml(d.title || "(제목 없음)")}</div>
+          <div class="content">${escapeHtml(d.content || "")}</div>
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+            ${tags || `<span class="muted">태그 없음</span>`}
+          </div>
+          <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="button" data-edit="${d.id}">수정</button>
+            <button type="button" class="danger" data-remove="${
+              d.id
+            }">삭제</button>
+          </div>
+        `;
+
+          listEl.appendChild(el);
+        }
+
+        updateDeleteButton();
+      }
+
+      // ----- Actions -----
+      function resetForm() {
+        lucidEl.value = "no";
+        moodEl.value = "🙂 좋음";
+        tagsEl.value = "";
+        titleEl.value = "";
+        contentEl.value = "";
+        titleEl.focus();
+      }
+
+      function upsertDream(editedId = null) {
+        const date = dateEl.value;
+        const title = titleEl.value.trim();
+        const content = contentEl.value.trim();
+        const mood = moodEl.value;
+        const lucid = lucidEl.value === "yes";
+        const tags = parseTags(tagsEl.value);
+
+        if (!date) {
+          alert("날짜를 선택해 주세요.");
+          return;
+        }
+        if (!title && !content) {
+          alert("제목 또는 내용을 입력해 주세요.");
+          return;
+        }
+
+        if (editedId) {
+          const idx = dreams.findIndex((d) => d.id === editedId);
+          if (idx === -1) return;
+          dreams[idx] = {
+            ...dreams[idx],
+            date,
+            title,
+            content,
+            mood,
+            lucid,
+            tags,
+          };
+        } else {
+          /** @type {Dream} */
+          const d = {
+            id: uid(),
+            date,
+            title,
+            content,
+            mood,
+            lucid,
+            tags,
+            createdAt: Date.now(),
+          };
+          dreams.push(d);
+        }
+
+        saveDreams(dreams);
+        render();
+        resetForm();
+      }
+
+      // ----- Event wiring -----
+      saveBtn.addEventListener("click", () => upsertDream());
+
+      resetBtn.addEventListener("click", () => resetForm());
+
+      deleteSelectedBtn.addEventListener("click", () => {
+        if (selectedIds.size === 0) return;
+        if (!confirm(`선택한 ${selectedIds.size}개 기록을 삭제할까요?`)) return;
+        dreams = dreams.filter((d) => !selectedIds.has(d.id));
+        selectedIds.clear();
+        saveDreams(dreams);
+        render();
+      });
+
+      listEl.addEventListener("click", (e) => {
+        const t = e.target;
+
+        // delete one
+        if (t && t.dataset && t.dataset.remove) {
+          const id = t.dataset.remove;
+          const d = dreams.find((x) => x.id === id);
+          if (!d) return;
+          if (!confirm(`"${d.title || "(제목 없음)"}" 기록을 삭제할까요?`))
+            return;
+          dreams = dreams.filter((x) => x.id !== id);
+          selectedIds.delete(id);
+          saveDreams(dreams);
+          render();
+          return;
+        }
+
+        // edit
+        if (t && t.dataset && t.dataset.edit) {
+          const id = t.dataset.edit;
+          const d = dreams.find((x) => x.id === id);
+          if (!d) return;
+
+          // load into form
+          dateEl.value = d.date || dateEl.value;
+          lucidEl.value = d.lucid ? "yes" : "no";
+          moodEl.value = d.mood || "🙂 좋음";
+          tagsEl.value = (d.tags || []).join(", ");
+          titleEl.value = d.title || "";
+          contentEl.value = d.content || "";
+
+          // transform save button into "update once"
+          saveBtn.textContent = "수정 저장";
+          saveBtn.classList.add("primary");
+
+          const handler = () => {
+            upsertDream(id);
+            saveBtn.textContent = "저장";
+            saveBtn.removeEventListener("click", handler);
+          };
+          saveBtn.addEventListener("click", handler, { once: true });
+
+          titleEl.focus();
+          return;
+        }
+      });
+
+      listEl.addEventListener("change", (e) => {
+        const t = e.target;
+        if (t && t.matches('input[type="checkbox"][data-id]')) {
+          const id = t.dataset.id;
+          if (t.checked) selectedIds.add(id);
+          else selectedIds.delete(id);
+          updateDeleteButton();
+        }
+      });
+
+      [searchEl, filterMoodEl, sortEl].forEach((el) =>
+        el.addEventListener("input", render)
+      );
+
+      // export/import
+      exportBtn.addEventListener("click", () => {
+        const payload = {
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          dreams,
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `dream-journal-backup-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      importBtn.addEventListener("click", () => importFileEl.click());
+
+      importFileEl.addEventListener("change", async () => {
+        const file = importFileEl.files?.[0];
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          const parsed = JSON.parse(text);
+
+          const incoming = Array.isArray(parsed) ? parsed : parsed?.dreams;
+          if (!Array.isArray(incoming))
+            throw new Error("형식이 올바르지 않습니다.");
+
+          // minimal validation
+          const cleaned = incoming
+            .filter((d) => d && typeof d === "object")
+            .map((d) => ({
+              id: typeof d.id === "string" ? d.id : uid(),
+              date: typeof d.date === "string" ? d.date : "",
+              title: typeof d.title === "string" ? d.title : "",
+              content: typeof d.content === "string" ? d.content : "",
+              mood: typeof d.mood === "string" ? d.mood : "😐 보통",
+              lucid: !!d.lucid,
+              tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+              createdAt:
+                typeof d.createdAt === "number" ? d.createdAt : Date.now(),
+            }));
+
+          const merge = confirm(
+            "기존 기록에 합칠까요?\n(취소를 누르면 기존 기록을 덮어씁니다)"
+          );
+          dreams = merge ? [...dreams, ...cleaned] : cleaned;
+
+          // de-dup by id
+          const map = new Map();
+          for (const d of dreams) map.set(d.id, d);
+          dreams = Array.from(map.values());
+
+          saveDreams(dreams);
+          selectedIds.clear();
+          render();
+          alert("가져오기가 완료되었습니다.");
+        } catch (err) {
+          alert("가져오기 실패: " + (err?.message || "알 수 없는 오류"));
+        } finally {
+          importFileEl.value = "";
+        }
+      });
+
+      // first render
+      render();
+    </script>
+  </body>
+</html>
