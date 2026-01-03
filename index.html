@@ -230,7 +230,32 @@
         align-items: center;
       }
     </style>
-  </head>
+      <!-- responsive-base -->
+    <style>
+      /* responsive-base */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      img,
+      video,
+      canvas,
+      svg {
+        max-width: 100%;
+        height: auto;
+      }
+      table {
+        width: 100%;
+      }
+      pre,
+      code {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+</head>
 
   <body>
     <header>
@@ -365,10 +390,6 @@
       >
         다른 서비스 보기 ↗
       </a>
-    </div>
-
-    <div class="footer">
-      팁: 크롬/엣지에서 "앱으로 설치"하면 간단한 꿈일기 앱처럼 쓸 수 있어요.
     </div>
 
     <script>
