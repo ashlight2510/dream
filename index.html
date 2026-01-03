@@ -3,7 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      property="og:image"
+      content="https://dummyimage.com/1200x630/0b1220/ffffff&amp;text=Dream"
+    />
     <title>꿈일기</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <style>
       :root {
         --bg: #0b0f14;
@@ -197,6 +202,28 @@
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
           "Liberation Mono", monospace;
       }
+      .external-link {
+        display: inline-block;
+        font-size: 12px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+      .external-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .footer-links {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 16px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
     </style>
   </head>
 
@@ -324,8 +351,14 @@
       </section>
     </main>
 
+    <div class="footer-links">
+      <a href="https://funnyfunny.cloud/" class="external-link" target="_blank" rel="noopener noreferrer">
+        다른 서비스 보기 ↗
+      </a>
+    </div>
+
     <div class="footer">
-      팁: 크롬/엣지에서 “앱으로 설치”하면 간단한 꿈일기 앱처럼 쓸 수 있어요.
+      팁: 크롬/엣지에서 "앱으로 설치"하면 간단한 꿈일기 앱처럼 쓸 수 있어요.
     </div>
 
     <script>
