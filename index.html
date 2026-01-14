@@ -196,6 +196,43 @@
         text-align: center;
         padding: 24px 8px;
       }
+      .lang-switch {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        display: inline-flex;
+        gap: 0;
+        padding: 3px;
+        border-radius: 999px;
+        background: rgba(18, 25, 38, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        border: 1px solid rgba(106, 169, 255, 0.2);
+      }
+      .lang-switch button {
+        border: none;
+        background: transparent;
+        color: rgba(234, 242, 255, 0.6);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 44px;
+        text-align: center;
+        letter-spacing: 0.02em;
+      }
+      .lang-switch button.active {
+        background: rgba(106, 169, 255, 0.3);
+        color: #eaf2ff;
+        box-shadow: 0 2px 8px rgba(106, 169, 255, 0.4);
+      }
+      .lang-switch button:not(.active):hover {
+        background: rgba(106, 169, 255, 0.1);
+        color: rgba(234, 242, 255, 0.9);
+      }
       .footer {
         max-width: 980px;
         margin: 16px auto;
@@ -270,8 +307,12 @@
 </head>
 
   <body>
+    <div class="lang-switch" role="tablist" aria-label="Language switcher">
+      <button type="button" data-lang="ko" class="active">KR</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
     <header>
-      <h1>꿈일기</h1>
+      <h1 data-i18n="title">꿈일기</h1>
       <div class="sub">
         브라우저에 저장되는 개인 꿈 기록장 (localStorage 사용).<br />
         내보내기(JSON)로 백업하거나 가져오기(JSON)로 복원할 수 있어요.
@@ -599,11 +640,11 @@
         const tags = parseTags(tagsEl.value);
 
         if (!date) {
-          alert("날짜를 선택해 주세요.");
+          alert(t("alertDateRequired"));
           return;
         }
         if (!title && !content) {
-          alert("제목 또는 내용을 입력해 주세요.");
+          alert(t("alertContentRequired"));
           return;
         }
 
@@ -646,7 +687,7 @@
 
       deleteSelectedBtn.addEventListener("click", () => {
         if (selectedIds.size === 0) return;
-        if (!confirm(`선택한 ${selectedIds.size}개 기록을 삭제할까요?`)) return;
+        if (!confirm(t("confirmDelete", { count: selectedIds.size }))) return;
         dreams = dreams.filter((d) => !selectedIds.has(d.id));
         selectedIds.clear();
         saveDreams(dreams);
@@ -661,7 +702,7 @@
           const id = t.dataset.remove;
           const d = dreams.find((x) => x.id === id);
           if (!d) return;
-          if (!confirm(`"${d.title || "(제목 없음)"}" 기록을 삭제할까요?`))
+          if (!confirm(t("confirmDeleteOne", { title: d.title || "(제목 없음)" })))
             return;
           dreams = dreams.filter((x) => x.id !== id);
           selectedIds.delete(id);
@@ -685,12 +726,12 @@
           contentEl.value = d.content || "";
 
           // transform save button into "update once"
-          saveBtn.textContent = "수정 저장";
+          saveBtn.textContent = t("updateBtn");
           saveBtn.classList.add("primary");
 
           const handler = () => {
             upsertDream(id);
-            saveBtn.textContent = "저장";
+            saveBtn.textContent = t("saveBtn");
             saveBtn.removeEventListener("click", handler);
           };
           saveBtn.addEventListener("click", handler, { once: true });
