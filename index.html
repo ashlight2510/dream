@@ -321,7 +321,7 @@
 
     <main>
       <!-- 입력 -->
-      <section class="card" aria-label="꿈일기 작성">
+      <section class="card" aria-label="" data-i18n-aria="sectionRecord">
         <h2 style="margin: 0 0 12px; font-size: 16px" data-i18n="recordTitle">기록하기</h2>
 
         <div class="row">
@@ -342,11 +342,11 @@
           <div>
             <label for="mood" data-i18n="moodLabel">기분</label>
             <select id="mood">
-              <option value="🙂 좋음">🙂 좋음</option>
-              <option value="😐 보통">😐 보통</option>
-              <option value="😟 불안">😟 불안</option>
-              <option value="😱 악몽">😱 악몽</option>
-              <option value="🤯 혼란">🤯 혼란</option>
+              <option value="good" data-i18n="moodGood">🙂 좋음</option>
+              <option value="normal" data-i18n="moodNormal">😐 보통</option>
+              <option value="anxious" data-i18n="moodAnxious">😟 불안</option>
+              <option value="nightmare" data-i18n="moodNightmare">😱 악몽</option>
+              <option value="confused" data-i18n="moodConfused">🤯 혼란</option>
             </select>
           </div>
           <div>
@@ -403,7 +403,7 @@
       </section>
 
       <!-- 목록 -->
-      <section class="card" aria-label="꿈일기 목록">
+      <section class="card" aria-label="" data-i18n-aria="sectionList">
         <div class="toolbar">
           <div>
             <label for="search" data-i18n="searchLabel">검색</label>
@@ -413,11 +413,11 @@
             <label for="filterMood" data-i18n="filterMoodLabel">기분 필터</label>
             <select id="filterMood">
               <option value="" data-i18n="filterMoodAll">전체</option>
-              <option value="🙂 좋음">🙂 좋음</option>
-              <option value="😐 보통">😐 보통</option>
-              <option value="😟 불안">😟 불안</option>
-              <option value="😱 악몽">😱 악몽</option>
-              <option value="🤯 혼란">🤯 혼란</option>
+              <option value="good" data-i18n="moodGood">🙂 좋음</option>
+              <option value="normal" data-i18n="moodNormal">😐 보통</option>
+              <option value="anxious" data-i18n="moodAnxious">😟 불안</option>
+              <option value="nightmare" data-i18n="moodNightmare">😱 악몽</option>
+              <option value="confused" data-i18n="moodConfused">🤯 혼란</option>
             </select>
           </div>
           <div>
@@ -443,7 +443,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        다른 서비스 보기 ↗
+        <span data-i18n="otherServices">다른 서비스 보기</span> ↗
       </a>
     </div>
 
@@ -538,7 +538,7 @@
         return `${y}.${m}.${d}`;
       }
 
-      function matches(d, q, moodFilter) {
+          function matches(d, q, moodFilter) {
         const query = q.trim().toLowerCase();
         const hay = [
           d.title,
@@ -551,7 +551,16 @@
           .toLowerCase();
 
         const okQuery = !query || hay.includes(query);
-        const okMood = !moodFilter || d.mood === moodFilter;
+        // Convert moodFilter value to display format for comparison
+        const moodMap = {
+          good: currentLang === "en" ? "🙂 Good" : "🙂 좋음",
+          normal: currentLang === "en" ? "😐 Normal" : "😐 보통",
+          anxious: currentLang === "en" ? "😟 Anxious" : "😟 불안",
+          nightmare: currentLang === "en" ? "😱 Nightmare" : "😱 악몽",
+          confused: currentLang === "en" ? "🤯 Confused" : "🤯 혼란",
+        };
+        const moodFilterDisplay = moodFilter ? moodMap[moodFilter] : "";
+        const okMood = !moodFilter || d.mood === moodFilterDisplay;
         return okQuery && okMood;
       }
 
@@ -626,7 +635,7 @@
       // ----- Actions -----
       function resetForm() {
         lucidEl.value = "no";
-        moodEl.value = "🙂 좋음";
+        moodEl.value = "good";
         tagsEl.value = "";
         titleEl.value = "";
         contentEl.value = "";
@@ -650,6 +659,16 @@
           return;
         }
 
+        // Convert mood value to display format
+        const moodMap = {
+          good: currentLang === "en" ? "🙂 Good" : "🙂 좋음",
+          normal: currentLang === "en" ? "😐 Normal" : "😐 보통",
+          anxious: currentLang === "en" ? "😟 Anxious" : "😟 불안",
+          nightmare: currentLang === "en" ? "😱 Nightmare" : "😱 악몽",
+          confused: currentLang === "en" ? "🤯 Confused" : "🤯 혼란",
+        };
+        const moodDisplay = moodMap[mood] || mood;
+
         if (editedId) {
           const idx = dreams.findIndex((d) => d.id === editedId);
           if (idx === -1) return;
@@ -658,7 +677,7 @@
             date,
             title,
             content,
-            mood,
+            mood: moodDisplay,
             lucid,
             tags,
           };
@@ -669,7 +688,7 @@
             date,
             title,
             content,
-            mood,
+            mood: moodDisplay,
             lucid,
             tags,
             createdAt: Date.now(),
@@ -722,7 +741,20 @@
           // load into form
           dateEl.value = d.date || dateEl.value;
           lucidEl.value = d.lucid ? "yes" : "no";
-          moodEl.value = d.mood || "🙂 좋음";
+          // Convert mood display back to value
+          const moodValueMap = {
+            "🙂 좋음": "good",
+            "🙂 Good": "good",
+            "😐 보통": "normal",
+            "😐 Normal": "normal",
+            "😟 불안": "anxious",
+            "😟 Anxious": "anxious",
+            "😱 악몽": "nightmare",
+            "😱 Nightmare": "nightmare",
+            "🤯 혼란": "confused",
+            "🤯 Confused": "confused",
+          };
+          moodEl.value = moodValueMap[d.mood] || "good";
           tagsEl.value = (d.tags || []).join(", ");
           titleEl.value = d.title || "";
           contentEl.value = d.content || "";
@@ -839,6 +871,11 @@
           lucidNo: "아니오",
           lucidYes: "예",
           moodLabel: "기분",
+          moodGood: "🙂 좋음",
+          moodNormal: "😐 보통",
+          moodAnxious: "😟 불안",
+          moodNightmare: "😱 악몽",
+          moodConfused: "🤯 혼란",
           tagsLabel: "태그 (쉼표로 구분)",
           tagsPlaceholder: "예: 학교, 바다, 추격전",
           titleLabel: "제목",
@@ -876,6 +913,8 @@
           importFail: "가져오기 실패: {error}",
           importMergeConfirm: "기존 기록에 합칠까요?\n(취소를 누르면 기존 기록을 덮어씁니다)",
           importFormatError: "형식이 올바르지 않습니다.",
+          sectionRecord: "꿈일기 작성",
+          sectionList: "꿈일기 목록",
         },
         en: {
           title: "Dream Journal",
@@ -886,6 +925,11 @@
           lucidNo: "No",
           lucidYes: "Yes",
           moodLabel: "Mood",
+          moodGood: "🙂 Good",
+          moodNormal: "😐 Normal",
+          moodAnxious: "😟 Anxious",
+          moodNightmare: "😱 Nightmare",
+          moodConfused: "🤯 Confused",
           tagsLabel: "Tags (comma-separated)",
           tagsPlaceholder: "e.g., school, ocean, chase",
           titleLabel: "Title",
@@ -923,6 +967,8 @@
           importFail: "Import failed: {error}",
           importMergeConfirm: "Merge with existing records?\n(Cancel to overwrite existing records)",
           importFormatError: "Invalid format.",
+          sectionRecord: "Record dream",
+          sectionList: "Dream list",
         },
       };
 
@@ -951,6 +997,9 @@
         document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
           el.placeholder = t(el.dataset.i18nPlaceholder);
         });
+        document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+          el.setAttribute("aria-label", t(el.dataset.i18nAria));
+        });
         // Update select options
         const lucidSelect = $("lucid");
         if (lucidSelect) {
@@ -961,12 +1010,20 @@
         }
         const moodSelect = $("mood");
         if (moodSelect) {
-          // Mood options are emoji-based, keep as is
+          Array.from(moodSelect.options).forEach((opt) => {
+            const key = opt.dataset.i18n;
+            if (key) opt.textContent = t(key);
+          });
         }
         const filterMoodSelect = $("filterMood");
         if (filterMoodSelect) {
           Array.from(filterMoodSelect.options).forEach((opt) => {
-            if (opt.value === "") opt.textContent = t("filterMoodAll");
+            if (opt.value === "") {
+              opt.textContent = t("filterMoodAll");
+            } else {
+              const key = opt.dataset.i18n;
+              if (key) opt.textContent = t(key);
+            }
           });
         }
         const sortSelect = $("sort");
